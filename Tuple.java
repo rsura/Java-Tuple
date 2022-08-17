@@ -56,7 +56,7 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      * {@link #emptyTuple}. Has no contents.
      */
     public Tuple(){
-		tupleContents = emptyTuple.tupleContents;
+		tupleContents = new Object[0];
 	}
 
     /**
