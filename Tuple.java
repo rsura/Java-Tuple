@@ -1,3 +1,6 @@
+import java.io.Serializable;
+import java.lang.Iterable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,7 +12,7 @@ import java.util.List;
  * 
  * @author  Rahul Sura
  */
-public class Tuple{
+public class Tuple implements Iterable, Cloneable, Serializable{
     
     /**
      * The contents of the Tuple.
@@ -80,7 +83,7 @@ public class Tuple{
 
     /**
      * Gets the number of objects in the Tuple. Identical to {@link #length()}.
-     * @return  the number of objects in the Tuple.
+     * @return  The number of objects in the Tuple.
      */
     public int size(){
 		return this.tupleContents.length;
@@ -88,9 +91,41 @@ public class Tuple{
 
     /**
      * Gets the number of objects in the Tuple. Identical to {@link #size()}.
-     * @return  the number of objects in the Tuple.
+     * @return  The number of objects in the Tuple.
      */
 	public int length(){
 		return this.tupleContents.length;
+	}
+
+    /**
+     * Clones the Tuple into another Tuple. Similar to the
+     * copy constructor {@link #Tuple(Tuple)}. Implemented method
+     * for {@link Cloneable} interface.
+     */
+    @Override
+    public Tuple clone(){
+		Object[] oArr = tupleContents.clone();
+		return new Tuple(oArr);
+	}
+
+    /**
+     * An overriden method to allow iteration with the enhanced 
+     * {@code for} statement.
+     * @return  An iterator for the enhanced for loop.
+     */
+    @Override
+	public Iterator<Object> iterator() {
+		return new Iterator<>() {
+			private int i = -1;
+			@Override
+			public boolean hasNext() {
+				return i < tupleContents.length - 1;
+			}
+
+			@Override
+			public Object next() {
+				return hasNext() ? tupleContents[++i] : null;
+			}
+		};
 	}
 }
