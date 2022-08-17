@@ -65,6 +65,8 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      * @param   objects All the objects to be placed in the Tuple.
      */
     public Tuple(Object... objects){
+		// Although a user can pass in a variable number of elements, it's interpreted
+		// as an array
 		tupleContents = objects.clone();
 	}
 
@@ -75,19 +77,12 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      * @param   iterable Any data structure that implements the Iterable<?> interface.
      */
     public Tuple(Iterable<?> iterable){
+		// Creates a new Tuple based off any iterable, including another Tuple, Set, List, etc.
 		List<Object> tempList = new LinkedList<>();
 		while (iterable.iterator().hasNext()){
 			tempList.add(iterable.iterator().next());
 		}
 		this.tupleContents = tempList.toArray().clone();
-	}
-
-    /**
-     * Copy constructor. Creates an identical tuple, also with unmodifiable contents.
-     * @param   tuple The Tuple to be copied.
-     */
-    public Tuple(Tuple tuple){
-		tupleContents = tuple.tupleContents.clone();
 	}
 
     /**
@@ -102,9 +97,12 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      * @throws  ArrayIndexOutOfBoundsException If the index is not in the Tuple.
      */
     public <Any> Any get(int index) throws ArrayIndexOutOfBoundsException{
-		if (index < 0 || index >= tupleContents.length){
+		if (index < 0 || index >= tupleContents.length){ // Needs to be in bounds
 			throw new ArrayIndexOutOfBoundsException("Tuple index out of range");
 		}
+
+		// Casting to Any allows auto down-casting and assignment to primitives instead of
+		// instances of an object's child
 		return ((Any) tupleContents[index]);
 	}
 
@@ -131,17 +129,17 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      */
     @Override
     public Tuple clone(){
-		Object[] oArr = tupleContents.clone();
-		return new Tuple(oArr);
+		return new Tuple(tupleContents.clone());
 	}
 
     /**
-     * An overriden method to allow iteration with the enhanced 
+     * An overridden method to allow iteration with the enhanced 
      * {@code for} statement.
      * @return  An iterator for the enhanced for loop.
      */
     @Override
 	public Iterator<Object> iterator() {
+		// Implements an iterator for a foreach loop as well as copy constructor
 		return new Iterator<>() {
 			private int i = -1;
 			@Override
@@ -164,11 +162,20 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 	}
 
     /**
-     * Checks if the provided Tuple is equal to this Tuple.
-     * @param   t A Tuple to be compared with.
+     * Checks if the provided Tuple is equal to the passed Object.
+     * @param   obj An Object to be compared with.
      * @return  A boolean if the two Tuples are the same.
      */
-	public boolean equals(Tuple t){
+    @Override
+	public boolean equals(Object obj) {
+		// This is with an Object instead of a Tuple, in case
+
+		// Classes need to match
+		if(obj.getClass() != Tuple.class){
+			return false;
+		}
+
+		Tuple t = (Tuple) obj;
 		if (this.tupleContents.length != t.tupleContents.length){
 			return false;
 		}
@@ -176,6 +183,7 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 			return true;
 		}
 
+		// Checks if each element is the same iteratively
 		for (int i = 0; i < tupleContents.length; i++) {
 			if (t.get(i).getClass() == Tuple.class){
 				if(!equals(t.get(i))) return false;
@@ -188,29 +196,19 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 	}
 
     /**
-     * Checks if the provided Tuple is equal to the passed Object.
-     * @param   t A Tuple to be compared with.
-     * @return  A boolean if the two Tuples are the same.
-     */
-    @Override
-	public boolean equals(Object obj) {
-		if(obj.getClass() == Tuple.class){
-			return equals((Tuple) obj);
-		}
-		return false;
-	}
-
-    /**
-     * Checks if an object's declaring class has an overriden
+     * Checks if an object's declaring class has an overridden
      * toString method. 
      * @param   o The object to check.
-     * @return  A boolean representing if the toString is overriden.
+     * @return  A boolean representing if the toString is overridden.
      */
     private static boolean containsToString(Object o) {
         if (o == null){
             return false;
         }
+		// Try-catch to handle the possible unhandled exception, even though every object has
+		// a toString method
 		try {
+			// Does declaring class of object override the toString method?
 			return o.getClass().getMethod("toString").getDeclaringClass() != Object.class;
 		} catch (Exception ignored){}
 		return false;
@@ -229,8 +227,10 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 			if (c != '\n' && c != '\t'){
 				condensed.append(c);
 			} else if (c == '\n'){
+				// purple "\n" character appended to show it's a new line char
 				condensed.append(Color.purple).append("\\n").append(Color.reset);
 			} else {
+				// purple "\t" character appended to show it's a tab char
 				condensed.append(Color.purple).append("\\t").append(Color.reset);
 			}
 		}
@@ -246,55 +246,75 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      */
     private void appendElement(Object o, StringBuilder s){
 		if (Objects.isNull(o)){
+			// Checks if object o is null (colored purple)
 			s.append(Color.purple).append("null").append(Color.reset);
 		} else if (o == this) {
+			
+			// Checks if object o is this Tuple (so that there's no recursive toString)
 			s.append(Color.purple).append("this Tuple").append(Color.reset);
 		} else if(o.getClass() == Integer.class || o.getClass() == Double.class ||
 				o.getClass() == Float.class || o.getClass() == Long.class ||
 				o.getClass() == Byte.class || o.getClass() == Short.class ||
 				o.getClass() == BigInteger.class || o.getClass() == BigDecimal.class
 		){
+			// Checks if the object is a number or big number
 			s.append(o);
 		} else if (o.getClass() == Boolean.class) {
+			// Checks if object is a boolean (colored purple)
 			s.append(Color.purple).append(o).append(Color.reset);
 		} else if (o.getClass() == Character.class){
+			// Checks if object is a char, to put ' ' around the char
 			s.append("'").append(removeNewLineAndTabs(String.valueOf((char) o))).append("'");
 		} else if (o.getClass() == String.class ||
-				o.getClass() == StringBuilder.class){
+				o.getClass() == StringBuilder.class ||
+				o.getClass() == StringBuffer.class){
+			// Checks if it's a String-type representation class to put double quotes around
 			s.append('"').append(removeNewLineAndTabs(o.toString())).append('"');
 		} else if (o.getClass() == Tuple.class){
+			// Checks if the object is another Tuple
 			s.append(o);
 		} else if (o.getClass().isArray()){
+			// Checking if object is an array
+
+			// Converting the object to explicit Array form
 			Object[] oArr = new Object[Array.getLength(o)];
 			for(int i = 0; i < oArr.length; ++i){
 				oArr[i] = Array.get(o, i);
 			}
+
+			// Appending each element like a Tuple would do
 			s.append('[');
 			for (int i = 0; i < oArr.length - 1; ++i) {
 				if (oArr[i].getClass().isArray() && Arrays.equals(oArr, (Object[]) oArr[i])) {
-					s.append("(this Collection)");
+					s.append(Color.purple).append("(this Collection)").append(Color.reset);
 				} else {
 					appendElement(oArr[i], s);
 				}
 				s.append(", ");
 			}
+			// Appending the last element (so that there's no comma at the end)
 			if (oArr.length > 0) {
 				if (oArr[oArr.length - 1].getClass().isArray() && Arrays.equals(oArr, (Object[]) oArr[oArr.length - 1])) {
-					s.append("(this Collection)");
+					s.append(Color.purple).append("(this Collection)").append(Color.reset);
 				} else {
 					appendElement(oArr[oArr.length - 1], s);
 				}
 			}
 			s.append(']');
 		} else if (o instanceof Iterable<?>){
+			// Converts an iterable to an array form and appends that array
 			List<Object> list = new LinkedList<>();
 			((Iterable<?>) o).forEach(list::add);
 			appendElement(list.toArray(), s);
 		} else if (containsToString(o)){
+			// Checks if the object has some overridden toString that's unaccounted for
+			// to be put in " "
 			s.append('"')
 				.append(removeNewLineAndTabs(o.toString()))
 				.append('"');
 		} else {
+			// If none of all the options above, then append the default object's toString
+			// which includes class name and hex code of the memory address.
 			s.append(o);
 		}
 	}
@@ -309,12 +329,18 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
     @Override
     public String toString(){
 		StringBuilder s = new StringBuilder("(");
+
+		// Iterates through all elements
 		for (int i = 0; i < tupleContents.length - 1; i++) {
 			appendElement(tupleContents[i], s);
 			s.append(", ");
 		}
+
+		// Last element appended
 		if(tupleContents.length > 0) appendElement(tupleContents[tupleContents.length - 1], s);
 		s.append(")");
+
+		// Converts the final StringBuilder to a String
 		return s.toString();
 	}
 }

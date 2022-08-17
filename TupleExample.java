@@ -6,7 +6,7 @@ import java.security.InvalidParameterException;
  * 
  * @author  Rahul Sura
  */
-public class TupleEx {
+public class TupleExample {
 
     /**
      * Returns the properties of a circle from a given
