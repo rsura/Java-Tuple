@@ -59,4 +59,38 @@ public class Tuple{
     public Tuple(Tuple tuple){
 		tupleContents = tuple.tupleContents.clone();
 	}
+
+    /**
+     * Gets the object from the Tuple. Doesn't require casting when assigning it
+     * to a variable, as long as the variable's data type matches, such as in
+     * {@code int i = new Tuple(1, "Hello World!").get(0)}. May need casting where 
+     * variable type is ambiguous, such as {@code System.out.println(String s);} 
+     * versus {@code System.out.println(char[] c);}. In Java 10 or later, the return 
+     * contents of this method can be assigned using {@code var obj = myTuple.get(0);}.
+     * @param   index The index of the object you want to obtain in the Tuple.
+     * @return  The auto-castable object from the Tuple at a given index.
+     * @throws  ArrayIndexOutOfBoundsException If the index is not in the Tuple.
+     */
+    public <Any> Any get(int index) throws ArrayIndexOutOfBoundsException{
+		if (index < 0 || index >= tupleContents.length){
+			throw new ArrayIndexOutOfBoundsException("Tuple index out of range");
+		}
+		return ((Any) tupleContents[index]);
+	}
+
+    /**
+     * Gets the number of objects in the Tuple. Identical to {@link #length()}.
+     * @return  the number of objects in the Tuple.
+     */
+    public int size(){
+		return this.tupleContents.length;
+	}
+
+    /**
+     * Gets the number of objects in the Tuple. Identical to {@link #size()}.
+     * @return  the number of objects in the Tuple.
+     */
+	public int length(){
+		return this.tupleContents.length;
+	}
 }
