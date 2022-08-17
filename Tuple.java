@@ -13,7 +13,7 @@ import java.util.Objects;
  * 
  * @author  Rahul Sura
  */
-public class Tuple implements Iterable, Cloneable, Serializable{
+public final class Tuple implements Iterable, Cloneable, Serializable{
     
     /**
      * The contents of the Tuple.
@@ -24,6 +24,28 @@ public class Tuple implements Iterable, Cloneable, Serializable{
      * A default empty Tuple that can be used without creating a new Tuple.
      */
     public static final Tuple emptyTuple = new Tuple();
+
+    /**
+     * Color class for formatting terminal output colors (mainly for 
+     * {@link #toString}).
+     */
+    private static class Color{
+
+        /**
+         * ANSI Code for purple.
+         */
+		static final String purple = "\u001b[35m";
+
+        /**
+         * ANSI Code for red.
+         */
+		static final String red = "\u001b[31m";
+
+        /**
+         * ANSI Code for resetting the formatting.
+         */
+		static final String reset = "\u001b[0m";
+	}
     
     /**
      * Default constructor. Initializes an empty tuple, equivalent to the
@@ -173,4 +195,6 @@ public class Tuple implements Iterable, Cloneable, Serializable{
 		}
 		return false;
 	}
+
+    
 }
