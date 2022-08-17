@@ -3,6 +3,7 @@ import java.lang.Iterable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This Tuple class is meant to be similar to the Python 
@@ -127,5 +128,49 @@ public class Tuple implements Iterable, Cloneable, Serializable{
 				return hasNext() ? tupleContents[++i] : null;
 			}
 		};
+	}
+
+    /**
+     * Prints the current Tuple.
+     */
+    public void print(){
+		System.out.println(this);
+	}
+
+    /**
+     * Checks if the provided Tuple is equal to this Tuple.
+     * @param   t A Tuple to be compared with.
+     * @return  A boolean if the two Tuples are the same.
+     */
+	public boolean equals(Tuple t){
+		if (this.tupleContents.length != t.tupleContents.length){
+			return false;
+		}
+		if (this.tupleContents == t.tupleContents){
+			return true;
+		}
+
+		for (int i = 0; i < tupleContents.length; i++) {
+			if (t.get(i).getClass() == Tuple.class){
+				if(!equals(t.get(i))) return false;
+			}
+			if (!t.get(i).equals(this.get(i))){
+				return false;
+			}
+		}
+		return true;
+	}
+
+    /**
+     * Checks if the provided Tuple is equal to the passed Object.
+     * @param   t A Tuple to be compared with.
+     * @return  A boolean if the two Tuples are the same.
+     */
+    @Override
+	public boolean equals(Object obj) {
+		if(obj.getClass() == Tuple.class){
+			return equals((Tuple) obj);
+		}
+		return false;
 	}
 }
