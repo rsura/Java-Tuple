@@ -196,5 +196,41 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 		return false;
 	}
 
-    
+    /**
+     * Checks if an object's declaring class has an overriden
+     * toString method. 
+     * @param   o The object to check.
+     * @return  A boolean representing if the toString is overriden.
+     */
+    private static boolean containsToString(Object o) {
+        if (o == null){
+            return false;
+        }
+		try {
+			return o.getClass().getMethod("toString").getDeclaringClass() != Object.class;
+		} catch (Exception ignored){}
+		return false;
+	}
+
+    /**
+     * Replaces a string's new line character with a literal "\n" and tab character 
+     * with a "\t" literal. This is to prevent a Tuple being printed on multiple lines.
+     * @param   s A string to be modified.
+     * @return  The modified string.
+     */
+	private static String removeNewLineAndTabs(String s){
+		StringBuilder condensed = new StringBuilder();
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if (c != '\n' && c != '\t'){
+				condensed.append(c);
+			} else if (c == '\n'){
+				condensed.append(Color.purple).append("\\n").append(Color.reset);
+			} else {
+				condensed.append(Color.purple).append("\\t").append(Color.reset);
+			}
+		}
+
+		return condensed.toString();
+	}
 }
