@@ -1,5 +1,9 @@
 import java.io.Serializable;
 import java.lang.Iterable;
+import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -232,5 +236,85 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
 		}
 
 		return condensed.toString();
+	}
+
+    /**
+     * Appends elements of the Tuple in a cleaner way to make the toString more visible
+     * of the different types of data.
+     * @param   o The object (element) to append to the stringbuilder.
+     * @param   s The stringbuilder to append the object to.
+     */
+    private void appendElement(Object o, StringBuilder s){
+		if (Objects.isNull(o)){
+			s.append(Color.purple).append("null").append(Color.reset);
+		} else if (o == this) {
+			s.append(Color.purple).append("this Tuple").append(Color.reset);
+		} else if(o.getClass() == Integer.class || o.getClass() == Double.class ||
+				o.getClass() == Float.class || o.getClass() == Long.class ||
+				o.getClass() == Byte.class || o.getClass() == Short.class ||
+				o.getClass() == BigInteger.class || o.getClass() == BigDecimal.class
+		){
+			s.append(o);
+		} else if (o.getClass() == Boolean.class) {
+			s.append(Color.purple).append(o).append(Color.reset);
+		} else if (o.getClass() == Character.class){
+			s.append("'").append(removeNewLineAndTabs(String.valueOf((char) o))).append("'");
+		} else if (o.getClass() == String.class ||
+				o.getClass() == StringBuilder.class){
+			s.append('"').append(removeNewLineAndTabs(o.toString())).append('"');
+		} else if (o.getClass() == Tuple.class){
+			s.append(o);
+		} else if (o.getClass().isArray()){
+			Object[] oArr = new Object[Array.getLength(o)];
+			for(int i = 0; i < oArr.length; ++i){
+				oArr[i] = Array.get(o, i);
+			}
+			s.append('[');
+			for (int i = 0; i < oArr.length - 1; ++i) {
+				if (oArr[i].getClass().isArray() && Arrays.equals(oArr, (Object[]) oArr[i])) {
+					s.append("(this Collection)");
+				} else {
+					appendElement(oArr[i], s);
+				}
+				s.append(", ");
+			}
+			if (oArr.length > 0) {
+				if (oArr[oArr.length - 1].getClass().isArray() && Arrays.equals(oArr, (Object[]) oArr[oArr.length - 1])) {
+					s.append("(this Collection)");
+				} else {
+					appendElement(oArr[oArr.length - 1], s);
+				}
+			}
+			s.append(']');
+		} else if (o instanceof Iterable<?>){
+			List<Object> list = new LinkedList<>();
+			((Iterable<?>) o).forEach(list::add);
+			appendElement(list.toArray(), s);
+		} else if (containsToString(o)){
+			s.append('"')
+				.append(removeNewLineAndTabs(o.toString()))
+				.append('"');
+		} else {
+			s.append(o);
+		}
+	}
+
+    /**
+     * Returns an elegant version of the Tuple's string representation. Makes
+     * it relatively evident what type of data each element in the Tuple is,
+     * such as putting 'single quotes' around a character or highlighting a null
+     * element with different colored text.
+     * @return  A string representing the visual of the Tuple.
+     */
+    @Override
+    public String toString(){
+		StringBuilder s = new StringBuilder("(");
+		for (int i = 0; i < tupleContents.length - 1; i++) {
+			appendElement(tupleContents[i], s);
+			s.append(", ");
+		}
+		if(tupleContents.length > 0) appendElement(tupleContents[tupleContents.length - 1], s);
+		s.append(")");
+		return s.toString();
 	}
 }
