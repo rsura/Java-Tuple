@@ -78,6 +78,10 @@ public final class Tuple implements Iterable, Cloneable, Serializable{
      */
     public Tuple(Iterable<?> iterable){
 		// Creates a new Tuple based off any iterable, including another Tuple, Set, List, etc.
+		if (iterable instanceof Tuple){
+			this.tupleContents = ((Tuple) iterable).tupleContents.clone();
+			return;
+		}
 		List<Object> tempList = new LinkedList<>();
 		while (iterable.iterator().hasNext()){
 			tempList.add(iterable.iterator().next());
